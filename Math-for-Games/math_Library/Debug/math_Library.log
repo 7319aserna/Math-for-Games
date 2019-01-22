@@ -1,0 +1,5 @@
+﻿  vec3.cpp
+c:\users\s189074\source\repos\math-for-games\math-for-games\math_library\vec3.cpp(553): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  vec4.cpp
+  Generating Code...
+  math_Library.vcxproj -> C:\Users\s189074\source\repos\Math-for-Games\Math-for-Games\Debug\math_Library.lib
