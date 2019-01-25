@@ -265,7 +265,7 @@ mat3 mat3::operator*(const mat3 & rhs) const {
 		temp.axis[s].x = (axis[s].x * rhs.mm[0][0]) + (axis[s].y * rhs.mm[1][0]) + (axis[s].z * rhs.mm[2][0]);
 		temp.axis[s].y = (axis[s].x * rhs.mm[0][1]) + (axis[s].y * rhs.mm[1][1]) + (axis[s].z * rhs.mm[2][1]);
 		temp.axis[s].z = (axis[s].x * rhs.mm[0][2]) + (axis[s].y * rhs.mm[1][2]) + (axis[s].z * rhs.mm[2][2]);
-		std::cout << "xjbujhu: " << temp.axis[s].x << " y: " << temp.axis[s].y << " z: " << temp.axis[s].z << std::endl;
+		std::cout << "x: " << temp.axis[s].x << " y: " << temp.axis[s].y << " z: " << temp.axis[s].z << std::endl;
 	}
 	return temp;
 }
@@ -454,6 +454,7 @@ mat3 mat3::translation(const vec2 & vec) {
 
 // Returns a rotation matrix with the given rotation
 mat3 mat3::rotation(float rot) {
+	rot = myMath::DEG_TO_RAD(rot);
 	mat3 rotationTemp(cos(rot), -sin(rot), 0.0f,
 					  sin(rot), cos(rot),  0.0f,
 					  0.0f,		0.0f,	   1.0f);
@@ -498,6 +499,7 @@ vec2 mat3::operator*(const vec2 & rhs) const {
  // -----***** Matrix Transforms *****----- //
 // --------------------------------------- //
 transform2d::transform2d() {
+	parent = NULL;
 	localPos = { 0.0f, 0.0f };
 	localRot = 0.0f;
 	localScale = { 0.0f, 0.0f };
@@ -520,16 +522,6 @@ void transform2d::rotate(const float angle) {
 	std::cout << localRot;
 }
 
-//void transform2d::lookAt(const transform2d & target) {
-//}
-//
-//vec2 transform2d::forward() const {
-//	return vec2();
-//}
-//
-//void transform2d::setForward(const vec2 & newFwd) {
-//}
-
 mat3 transform2d::getTRSMatix() const {
 	return mat3::translation(localPos) * mat3::rotation(localRot) * mat3::scale(localScale);
 }
@@ -539,25 +531,32 @@ mat3 transform2d::getTRSMatix() const {
 // ----------------------------------------- //
 // World position of this object
 vec2 transform2d::worldPosition() const {
-	mat3 wPMat3 = parent->getTRSMatix() * getTRSMatix();
-	vec2 wPVec2({ wPMat3.m3, wPMat3.m6 });
-	return wPVec2;
+	if (parent != NULL) {
+		mat3 wPMat3 = parent->getTRSMatix() * getTRSMatix();
+		vec2 wPVec2({ wPMat3.m3, wPMat3.m6 });
+		return wPVec2;
+	}
+	return localPos;
 }
 
 // World rotation of this object
 float transform2d::worldRotation() const {
-	mat3 wRMat3 = parent->getTRSMatix() * getTRSMatix();
-	vec2 wRVec2({ wRMat3.m1, wRMat3.m4 });
-	// Note for later: Make a function that would convert...
-	// a vec2 into a float.
-	return myMath::RAD_TO_DEG(atan2f(wRVec2.y, wRVec2.x));
+	if (parent != NULL) {
+		mat3 wRMat3 = parent->getTRSMatix() * getTRSMatix();
+		vec2 wRVec2({ wRMat3.m1, wRMat3.m4 });
+		return myMath::RAD_TO_DEG(atan2f(wRVec2.y, wRVec2.x));
+	}
+	return localRot;
 }
 
 // World scale of this object (lossy)
 vec2 transform2d::worldScale() const {
-	mat3 wSMat3 = parent->getTRSMatix() * getTRSMatix();
-	vec2 wSVec2({ wSMat3.m1, wSMat3.m5 });
-	return wSVec2;
+	if (parent != NULL) {
+		mat3 wSMat3 = parent->getTRSMatix() * getTRSMatix();
+		vec2 wSVec2({ wSMat3.m1, wSMat3.m5 });
+		return wSVec2;
+	}
+	return localScale;
 }
 
 // Assigns a parent to this object

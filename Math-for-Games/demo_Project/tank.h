@@ -17,9 +17,6 @@ public:
 	Vector2 tankBodyPosition;
 	Vector2 tankTurretPosition;
 
-	Rectangle tankBodyRectangle;
-	Rectangle tankTurrentRectangle;
-
 	void update(float deltaTime);
 	void draw();
 };
